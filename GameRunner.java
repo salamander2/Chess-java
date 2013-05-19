@@ -38,16 +38,16 @@ class ButtonListener implements ActionListener
 class ImgLoader
 {
 
-	public Image board;
-	public String board_loc = "data/board.png";
+	public static Image board;
+	public static String board_loc = "data/board.png";
 	
-	public Image white_pieces[];
-	public String white_pc_loc = "data/white-62-transp.PNG";
+	public static Image white_pieces[];
+	public static String white_pc_loc = "data/white-62-transp.PNG";
 	
-	public Image black_pieces[];
-	public String black_pc_loc = "data/black-62-transp.PNG";
+	public static Image black_pieces[];
+	public static String black_pc_loc = "data/black-62-transp.PNG";
 	
-	public static final int TILE_SIZE = 62;
+	public static final int TILE_SIZE = 62; // the game is relying on TILE_SIZExTILE_SIZE images.
 	
 	/**
 		Default constructor attempts to load in the board image and the pieces images.
@@ -159,29 +159,29 @@ class Game
 		int i;
 		for (i = 0; i < 2; i++) {
 			//rooks
-			white_player[i] = new Piece(i * 434, 0, Game.PIECES.ROOK.ordinal(), Piece.COLORS.WHITE, this);
-			black_player[i] = new Piece(i * 434, 434, Game.PIECES.ROOK.ordinal(), Piece.COLORS.BLACK, this);
+			white_player[i] = new Piece(i * (ImgLoader.TILE_SIZE * 7), 0, Game.PIECES.ROOK.ordinal(), Piece.COLORS.WHITE, this);
+			black_player[i] = new Piece(i * (ImgLoader.TILE_SIZE * 7), (ImgLoader.TILE_SIZE * 7), Game.PIECES.ROOK.ordinal(), Piece.COLORS.BLACK, this);
 			
 			//knights
-			white_player[i + 2] = new Piece(ImgLoader.TILE_SIZE + i * 310, 0, Game.PIECES.KNIGHT.ordinal(), Piece.COLORS.WHITE, this);
-			black_player[i + 2] = new Piece(ImgLoader.TILE_SIZE + i * 310, 434, Game.PIECES.KNIGHT.ordinal(), Piece.COLORS.BLACK, this);
+			white_player[i + 2] = new Piece(ImgLoader.TILE_SIZE + i * (ImgLoader.TILE_SIZE * 5), 0, Game.PIECES.KNIGHT.ordinal(), Piece.COLORS.WHITE, this);
+			black_player[i + 2] = new Piece(ImgLoader.TILE_SIZE + i * (ImgLoader.TILE_SIZE * 5), (ImgLoader.TILE_SIZE * 7), Game.PIECES.KNIGHT.ordinal(), Piece.COLORS.BLACK, this);
 			
 			//bishops
-			white_player[i + 4] = new Piece((ImgLoader.TILE_SIZE * 2) + i * 186, 0, Game.PIECES.BISHOP.ordinal(), Piece.COLORS.WHITE, this);
-			black_player[i + 4] = new Piece((ImgLoader.TILE_SIZE * 2) + i * 186, 434, Game.PIECES.BISHOP.ordinal(), Piece.COLORS.BLACK, this);
+			white_player[i + 4] = new Piece((ImgLoader.TILE_SIZE * 2) + i * (ImgLoader.TILE_SIZE * 3), 0, Game.PIECES.BISHOP.ordinal(), Piece.COLORS.WHITE, this);
+			black_player[i + 4] = new Piece((ImgLoader.TILE_SIZE * 2) + i * (ImgLoader.TILE_SIZE * 3), (ImgLoader.TILE_SIZE * 7), Game.PIECES.BISHOP.ordinal(), Piece.COLORS.BLACK, this);
 		}
 		//queens
 		white_player[6] = new Piece((ImgLoader.TILE_SIZE * 3), 0, Game.PIECES.QUEEN.ordinal(), Piece.COLORS.WHITE, this);
-		black_player[6] = new Piece((ImgLoader.TILE_SIZE * 3), 434, Game.PIECES.QUEEN.ordinal(), Piece.COLORS.BLACK, this);
+		black_player[6] = new Piece((ImgLoader.TILE_SIZE * 3), (ImgLoader.TILE_SIZE * 7), Game.PIECES.QUEEN.ordinal(), Piece.COLORS.BLACK, this);
 		
 		//kings
 		white_player[7] = new Piece((ImgLoader.TILE_SIZE * 4), 0, Game.PIECES.KING.ordinal(), Piece.COLORS.WHITE, this);
-		black_player[7] = new Piece((ImgLoader.TILE_SIZE * 4), 434, Game.PIECES.KING.ordinal(), Piece.COLORS.BLACK, this);
+		black_player[7] = new Piece((ImgLoader.TILE_SIZE * 4), (ImgLoader.TILE_SIZE * 7), Game.PIECES.KING.ordinal(), Piece.COLORS.BLACK, this);
 		
 		//pawns
 		for (i = 0; i < 8; i++) {
 			white_player[8 + i] = new Piece(i * ImgLoader.TILE_SIZE, ImgLoader.TILE_SIZE, Game.PIECES.PAWN.ordinal(), Piece.COLORS.WHITE, this);
-			black_player[8 + i] = new Piece(i * ImgLoader.TILE_SIZE, 372, Game.PIECES.PAWN.ordinal(), Piece.COLORS.BLACK, this);
+			black_player[8 + i] = new Piece(i * ImgLoader.TILE_SIZE, (ImgLoader.TILE_SIZE * 6), Game.PIECES.PAWN.ordinal(), Piece.COLORS.BLACK, this);
 		}
 		
 		// handle mouse clicks
@@ -193,7 +193,7 @@ class Game
 				int y = e.getY();
 				
 				//we only want to know if it's on the board, the board ends at x = 497
-				if (x >= 497) {
+				if (x >= ImgLoader.board.getWidth(null)) {
 					// past the board
 				} else { // within the board
 					
@@ -296,7 +296,7 @@ class Game
 		//split up UpdateString based on newlines and draw them individually
 		i = 0;
 		for (String part : UpdateString.split("\n")) {
-			g.drawString(part, 500, 200 + (g.getFontMetrics().getHeight() * i));
+			g.drawString(part, ImgLoader.board.getWidth(null) + 3, 200 + (g.getFontMetrics().getHeight() * i));
 			i++;
 		}
 		if (i > 18) UpdateString = ""; // reset the UpdateString if we get too far down
@@ -308,8 +308,8 @@ class Game
 */
 class Piece
 {
-	public int x = 186; // these are set to the middle of the board for startup purposes
-	public int y = 186; // otherwise we'll set 0,0 on the board to null the first time
+	public int x = (ImgLoader.TILE_SIZE * (Board.BOARD_LENGTH / 2)); // these are set to the middle of the board for startup purposes
+	public int y = (ImgLoader.TILE_SIZE * (Board.BOARD_LENGTH / 2)); // otherwise we'll set 0,0 on the board to null the first time
 	public int piecenum;
 	public int total_moves = -1; //total moves for this piece; start at -1 because we call move() at startup
 	
@@ -544,6 +544,7 @@ class GameRunner
 		DrawGame dg = new DrawGame();
 		JFrame win = new JFrame();
 		win.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		win.setLocationRelativeTo(null);
 		win.add(dg);
 		win.setTitle("Chess by ebx");
 		win.setSize(screen_x, screen_y);
@@ -553,12 +554,12 @@ class GameRunner
 		
 		saveButton = new JButton("Save game");
 		saveButton.addActionListener(bListen);
-		saveButton.setBounds(515, 100, 100, 20); // board ends at 497
+		saveButton.setBounds(ImgLoader.board.getWidth(null) + 15, 100, 100, 20); // board ends at 497
 		dg.add(saveButton);
 		
 		loadButton = new JButton("Load game");
 		loadButton.addActionListener(bListen);
-		loadButton.setBounds(515, 150, 100, 20);
+		loadButton.setBounds(ImgLoader.board.getWidth(null) + 15, 150, 100, 20);
 		dg.add(loadButton);
 		
 		dg.setLayout(null);
